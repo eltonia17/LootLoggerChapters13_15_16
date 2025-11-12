@@ -7,6 +7,11 @@
 
 import UIKit
 
+// Define an error type that the ItemStore can throw
+enum ItemStoreError: Error {
+    case failedToSave
+}
+
 class ItemStore {
 
     var allItems = [Item]()
@@ -46,7 +51,7 @@ class ItemStore {
         // Insert item in array at new location
         allItems.insert(movedItem, at: toIndex)
     }
-    @objc func saveChanges() -> Bool {
+    func saveChanges() throws -> Bool {
         
         print("Saving items to: \(itemArchiveURL)")
 
@@ -58,10 +63,18 @@ class ItemStore {
                     return true
             } catch let encodingError {
                 print("Error encoding allItems: \(encodingError)")
-                return false
+                throw ItemStoreError.failedToSave
             }
        
     }
+    @objc func saveChangesSilently() {
+        do {
+            _ = try saveChanges()
+        } catch {
+            print("Error saving changes silently: \(error)")
+        }
+    }
+
     
     init() {
         do {
@@ -75,7 +88,7 @@ class ItemStore {
 
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self,
-                                       selector: #selector(saveChanges),
+                                       selector: #selector(saveChangesSilently),
                                        name: UIScene.didEnterBackgroundNotification,
                                        object: nil)
     }
