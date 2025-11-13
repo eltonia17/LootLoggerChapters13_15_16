@@ -7,12 +7,14 @@
 
 import UIKit
 
-// Define an error type that the ItemStore can throw
+// CH 13 BRONZE CHALLENGE: Define an error type that the ItemStore can throw
 enum ItemStoreError: Error {
     case failedToSave
 }
 
 class ItemStore {
+    //GOLD CHALLENGE:Add a static shared property for a single instance
+    static let shared = ItemStore()
 
     var allItems = [Item]()
     let itemArchiveURL: URL = {
